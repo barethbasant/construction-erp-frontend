@@ -1,4 +1,4 @@
-import { Grid, Card, CardContent, Typography } from "@mui/material";
+import {  Typography } from "@mui/material";
 
 const Dashboard = () => {
     return (
@@ -7,7 +7,7 @@ const Dashboard = () => {
                 Dashboard
             </Typography>
 
-            <Grid container spacing={3}>
+            {/* <Grid container spacing={3}>
                 <Grid item xs={12} md={4}>
                     <Card elevation={3}>
                         <CardContent>
@@ -40,7 +40,7 @@ const Dashboard = () => {
                         </CardContent>
                     </Card>
                 </Grid>
-            </Grid>
+            </Grid> */}
         </>
     );
 };

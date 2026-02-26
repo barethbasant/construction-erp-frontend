@@ -59,6 +59,20 @@ const Sidebar = ({ open }: SidebarProps) => {
                 </ListItemButton>
 
                 <ListItemButton
+                    selected={location.pathname === "/categories"}
+                    onClick={() => navigate("/categories")}
+                    sx={{
+                        "&.Mui-selected": { backgroundColor: "#334155" },
+                        "&:hover": { backgroundColor: "#334155" },
+                    }}
+                >
+                    <ListItemIcon>
+                        <InventoryIcon />
+                    </ListItemIcon>
+                    {open && <ListItemText primary="Category Master" />}
+                </ListItemButton>
+
+                <ListItemButton
                     selected={location.pathname === "/materials"}
                     onClick={() => navigate("/materials")}
                     sx={{
