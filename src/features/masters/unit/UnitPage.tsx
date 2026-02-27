@@ -12,27 +12,27 @@ import {
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import type { Category } from "../../../types/category";
-import CategoryForm from "./CategoryForm";
+import type { Unit } from "../../../types/unit";
+import UnitForm from "./UnitForm";
 import {
-  createCategory,
-  deleteCategory,
-  getCategories,
-  updateCategory,
-} from "./categoryApi";
+  createUnit,
+  deleteUnit,
+  getUnits,
+  updateUnit,
+} from "./unitApi";
 
 import { useLoader } from "../../../app/providers/LoaderProvider";
 import { useSnackbar } from "../../../app/providers/SnackBarProvider";
 
 import DataTable from "../../../components/common/DataTable";
 
-const CategoryPage = () => {
+const UnitPage = () => {
   const { showLoader, hideLoader } = useLoader();
   const { showSnackbar } = useSnackbar();
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [units, setUnits] = useState<Unit[]>([]);
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<Category | null>(null);
+  const [selected, setSelected] = useState<Unit | null>(null);
   const [search, setSearch] = useState("");
 
   // pagination
@@ -45,10 +45,10 @@ const CategoryPage = () => {
   const fetchData = async () => {
     try {
       showLoader();
-      const res = await getCategories();
-      setCategories(res.data);
+      const res = await getUnits();
+      setUnits(res.data);
     } catch {
-      showSnackbar("Failed to fetch categories", "error");
+      showSnackbar("Failed to fetch units", "error");
     } finally {
       hideLoader();
     }
@@ -61,16 +61,16 @@ const CategoryPage = () => {
   // ============================
   // HANDLERS
   // ============================
-  const handleAdd = async (data: any) => {
+  const handleSubmit = async (data: any) => {
     try {
       showLoader();
 
       if (selected) {
-        await updateCategory(selected.id, data);
-        showSnackbar("Category updated successfully");
+        await updateUnit(selected.id, data);
+        showSnackbar("Unit updated successfully");
       } else {
-        await createCategory(data);
-        showSnackbar("Category created successfully");
+        await createUnit(data);
+        showSnackbar("Unit created successfully");
       }
 
       fetchData();
@@ -83,7 +83,7 @@ const CategoryPage = () => {
     }
   };
 
-  const handleEdit = (row: Category) => {
+  const handleEdit = (row: Unit) => {
     setSelected(row);
     setOpen(true);
   };
@@ -91,7 +91,7 @@ const CategoryPage = () => {
   const handleDelete = async (id: number) => {
     try {
       showLoader();
-      await deleteCategory(id);
+      await deleteUnit(id);
       showSnackbar("Deleted successfully");
       fetchData();
     } catch {
@@ -104,29 +104,29 @@ const CategoryPage = () => {
   // ============================
   // SEARCH FILTER
   // ============================
-  const filtered = categories.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = units.filter((u) =>
+    u.name.toLowerCase().includes(search.toLowerCase())
   );
 
   // ============================
   // ROWS
   // ============================
-const rows = filtered.map((item, index) => ({
-  id: item.id,
-  name: item.name,
-  srNo: page * pageSize + index + 1,
-}));
+  const rows = filtered.map((item, index) => ({
+    id: item.id,
+    name: item.name,
+    srNo: page * pageSize + index + 1,
+  }));
 
   // ============================
   // COLUMNS
   // ============================
   const columns = [
     {
-    field: "srNo",
-    headerName: "#",
-    width: 80,
-    sortable: false,
-  },
+      field: "srNo",
+      headerName: "#",
+      width: 80,
+      sortable: false,
+    },
     {
       field: "name",
       headerName: "Name",
@@ -161,13 +161,13 @@ const rows = filtered.map((item, index) => ({
         mb={2}
       >
         <Typography variant="h5" fontWeight="bold">
-          Category Master
+          Unit Master
         </Typography>
 
         <Stack direction="row" spacing={2}>
           <TextField
             size="small"
-            placeholder="Search category..."
+            placeholder="Search unit..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             sx={{ width: 250 }}
@@ -180,7 +180,7 @@ const rows = filtered.map((item, index) => ({
               setOpen(true);
             }}
           >
-            Add Category
+            Add Unit
           </Button>
         </Stack>
       </Stack>
@@ -201,14 +201,14 @@ const rows = filtered.map((item, index) => ({
       </Card>
 
       {/* FORM */}
-      <CategoryForm
+      <UnitForm
         open={open}
         handleClose={() => setOpen(false)}
-        onSubmit={handleAdd}
+        onSubmit={handleSubmit}
         defaultValues={selected}
       />
     </Box>
   );
 };
 
-export default CategoryPage;
+export default UnitPage;

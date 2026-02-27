@@ -1,28 +1,48 @@
-/* Global Reset */
+/* RESET */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-/* Body */
+/* ROOT */
+html, body, #root {
+  height: 100%;
+}
+
+/* BODY */
 body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f4f6f8;
+  font-family: "Roboto", sans-serif;
+  background-color: #f4f6f8;
 }
 
-body {
-    font-family: 'Roboto', sans-serif;
-    background-color: #f5f7fa;
+/* PAGE WRAPPER */
+.page-container {
+  padding: 16px;
+  width: 100%;
 }
 
-/* Utility classes */
-.container {
-    padding: 20px;
+/* HEADER */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
 }
 
-.page-title {
-    font-size: 22px;
-    font-weight: 600;
-    margin-bottom: 20px;
+/* SEARCH */
+.page-search {
+  margin-bottom: 16px;
+  max-width: 300px;
+}
+
+/* CARD */
+.page-card {
+  width: 100%;
+  border-radius: 8px;
+}
+
+.page-container {
+  width: 100%;
+  padding: 16px;
 }

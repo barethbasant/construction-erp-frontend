@@ -23,20 +23,16 @@ const Sidebar = ({ open }: SidebarProps) => {
 
     return (
         <Drawer
-            variant="permanent"
-            sx={{
-                width: open ? drawerWidth : 70,
-                flexShrink: 0,
-                "& .MuiDrawer-paper": {
-                    width: open ? drawerWidth : 70,
-                    boxSizing: "border-box",
-                    transition: "width 0.3s",
-                    overflowX: "hidden",
-                    backgroundColor: "#1e293b",
-                    color: "#fff",
-                },
-            }}
-        >
+      variant="permanent"
+      sx={{
+        width: drawerWidth,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: drawerWidth,
+          boxSizing: "border-box",
+        },
+      }}
+    >
             <Toolbar />
 
             <List>
@@ -73,8 +69,22 @@ const Sidebar = ({ open }: SidebarProps) => {
                 </ListItemButton>
 
                 <ListItemButton
-                    selected={location.pathname === "/materials"}
-                    onClick={() => navigate("/materials")}
+                    selected={location.pathname === "/unit"}
+                    onClick={() => navigate("/unit")}
+                    sx={{
+                        "&.Mui-selected": { backgroundColor: "#334155" },
+                        "&:hover": { backgroundColor: "#334155" },
+                    }}
+                >
+                    <ListItemIcon>
+                        <InventoryIcon />
+                    </ListItemIcon>
+                    {open && <ListItemText primary="Unit Master" />}
+                </ListItemButton>
+
+                <ListItemButton
+                    selected={location.pathname === "/material"}
+                    onClick={() => navigate("/material")}
                     sx={{
                         "&.Mui-selected": {
                             backgroundColor: "#334155",
@@ -91,8 +101,8 @@ const Sidebar = ({ open }: SidebarProps) => {
                 </ListItemButton>
 
                 <ListItemButton
-                    selected={location.pathname === "/projects"}
-                    onClick={() => navigate("/projects")}
+                    selected={location.pathname === "/vendor"}
+                    onClick={() => navigate("/vendor")}
                     sx={{
                         "&.Mui-selected": {
                             backgroundColor: "#334155",
@@ -105,8 +115,64 @@ const Sidebar = ({ open }: SidebarProps) => {
                     <ListItemIcon>
                         <FolderIcon />
                     </ListItemIcon>
-                    {open && <ListItemText primary="Projects" />}
+                    {open && <ListItemText primary="Vendor" />}
                 </ListItemButton>
+
+                 <ListItemButton
+                    selected={location.pathname === "/site"}
+                    onClick={() => navigate("/site")}
+                    sx={{
+                        "&.Mui-selected": {
+                            backgroundColor: "#334155",
+                        },
+                        "&:hover": {
+                            backgroundColor: "#334155",
+                        },
+                    }}
+                >
+                    <ListItemIcon>
+                        <FolderIcon />
+                    </ListItemIcon>
+                    {open && <ListItemText primary="Site" />}
+                </ListItemButton>
+
+                 <ListItemButton
+                    selected={location.pathname === "/purchase-request"}
+                    onClick={() => navigate("/purchase-request")}
+                    sx={{
+                        "&.Mui-selected": {
+                            backgroundColor: "#334155",
+                        },
+                        "&:hover": {
+                            backgroundColor: "#334155",
+                        },
+                    }}
+                >
+                    <ListItemIcon>
+                        <FolderIcon />
+                    </ListItemIcon>
+                    {open && <ListItemText primary="Purchase Request" />}
+                </ListItemButton>
+
+                 <ListItemButton
+                    selected={location.pathname === "/purchase-order"}
+                    onClick={() => navigate("/purchase-order")}
+                    sx={{
+                        "&.Mui-selected": {
+                            backgroundColor: "#334155",
+                        },
+                        "&:hover": {
+                            backgroundColor: "#334155",
+                        },
+                    }}
+                >
+                    <ListItemIcon>
+                        <FolderIcon />
+                    </ListItemIcon>
+                    {open && <ListItemText primary="Purchase Order" />}
+                </ListItemButton>
+
+                
             </List>
         </Drawer>
     );

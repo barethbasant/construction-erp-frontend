@@ -8,31 +8,32 @@ import {
   Stack,
   TextField,
   Box,
+  Chip,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-import type { Category } from "../../../types/category";
-import CategoryForm from "./CategoryForm";
+import type { Site } from "../../../types/site";
 import {
-  createCategory,
-  deleteCategory,
-  getCategories,
-  updateCategory,
-} from "./categoryApi";
+  getSites,
+  updateSite,
+  createSite,
+  deleteSite,
+} from "./siteApi";
+import SiteForm from "./SiteForm";
 
 import { useLoader } from "../../../app/providers/LoaderProvider";
 import { useSnackbar } from "../../../app/providers/SnackBarProvider";
 
 import DataTable from "../../../components/common/DataTable";
 
-const CategoryPage = () => {
+const SitePage = () => {
   const { showLoader, hideLoader } = useLoader();
   const { showSnackbar } = useSnackbar();
 
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [sites, setSites] = useState<Site[]>([]);
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<Category | null>(null);
+  const [selected, setSelected] = useState<Site | null>(null);
   const [search, setSearch] = useState("");
 
   // pagination
@@ -45,10 +46,10 @@ const CategoryPage = () => {
   const fetchData = async () => {
     try {
       showLoader();
-      const res = await getCategories();
-      setCategories(res.data);
+      const res = await getSites();
+      setSites(res.data);
     } catch {
-      showSnackbar("Failed to fetch categories", "error");
+      showSnackbar("Failed to load sites", "error");
     } finally {
       hideLoader();
     }
@@ -61,29 +62,33 @@ const CategoryPage = () => {
   // ============================
   // HANDLERS
   // ============================
-  const handleAdd = async (data: any) => {
+  const handleSubmit = async (data: any) => {
     try {
       showLoader();
 
       if (selected) {
-        await updateCategory(selected.id, data);
-        showSnackbar("Category updated successfully");
+        await updateSite(selected.id, data);
+        showSnackbar("Site updated successfully");
       } else {
-        await createCategory(data);
-        showSnackbar("Category created successfully");
+        await createSite(data);
+        showSnackbar("Site created successfully");
       }
 
-      fetchData();
       setOpen(false);
       setSelected(null);
-    } catch (error: any) {
-      showSnackbar(error.message || "Something went wrong", "error");
+      fetchData();
+    } catch (err: any) {
+      if (err.response?.status === 409) {
+        showSnackbar("Site Code already exists", "error");
+      } else {
+        showSnackbar("Operation failed", "error");
+      }
     } finally {
       hideLoader();
     }
   };
 
-  const handleEdit = (row: Category) => {
+  const handleEdit = (row: Site) => {
     setSelected(row);
     setOpen(true);
   };
@@ -91,8 +96,8 @@ const CategoryPage = () => {
   const handleDelete = async (id: number) => {
     try {
       showLoader();
-      await deleteCategory(id);
-      showSnackbar("Deleted successfully");
+      await deleteSite(id);
+      showSnackbar("Site deleted successfully");
       fetchData();
     } catch {
       showSnackbar("Delete failed", "error");
@@ -104,33 +109,64 @@ const CategoryPage = () => {
   // ============================
   // SEARCH FILTER
   // ============================
-  const filtered = categories.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = sites.filter((s) =>
+    s.name.toLowerCase().includes(search.toLowerCase())
   );
 
   // ============================
   // ROWS
   // ============================
-const rows = filtered.map((item, index) => ({
-  id: item.id,
-  name: item.name,
-  srNo: page * pageSize + index + 1,
-}));
+  const rows = filtered.map((item, index) => ({
+    id: item.id,
+    srNo: page * pageSize + index + 1,
+    code: item.code,
+    name: item.name,
+    city: item.city || "-",
+    state: item.state || "-",
+    isActive: item.isActive,
+  }));
 
   // ============================
   // COLUMNS
   // ============================
   const columns = [
     {
-    field: "srNo",
-    headerName: "#",
-    width: 80,
-    sortable: false,
-  },
+      field: "srNo",
+      headerName: "#",
+      width: 80,
+      sortable: false,
+    },
+    {
+      field: "code",
+      headerName: "Code",
+      width: 120,
+    },
     {
       field: "name",
       headerName: "Name",
       flex: 1,
+    },
+    {
+      field: "city",
+      headerName: "City",
+      flex: 1,
+    },
+    {
+      field: "state",
+      headerName: "State",
+      flex: 1,
+    },
+    {
+      field: "isActive",
+      headerName: "Status",
+      width: 130,
+      renderCell: (params: any) => (
+        <Chip
+          label={params.value ? "Active" : "Inactive"}
+          color={params.value ? "success" : "default"}
+          size="small"
+        />
+      ),
     },
     {
       field: "actions",
@@ -161,13 +197,13 @@ const rows = filtered.map((item, index) => ({
         mb={2}
       >
         <Typography variant="h5" fontWeight="bold">
-          Category Master
+          Site Master
         </Typography>
 
         <Stack direction="row" spacing={2}>
           <TextField
             size="small"
-            placeholder="Search category..."
+            placeholder="Search site..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             sx={{ width: 250 }}
@@ -180,7 +216,7 @@ const rows = filtered.map((item, index) => ({
               setOpen(true);
             }}
           >
-            Add Category
+            Add Site
           </Button>
         </Stack>
       </Stack>
@@ -201,14 +237,14 @@ const rows = filtered.map((item, index) => ({
       </Card>
 
       {/* FORM */}
-      <CategoryForm
+      <SiteForm
         open={open}
         handleClose={() => setOpen(false)}
-        onSubmit={handleAdd}
+        onSubmit={handleSubmit}
         defaultValues={selected}
       />
     </Box>
   );
 };
 
-export default CategoryPage;
+export default SitePage;

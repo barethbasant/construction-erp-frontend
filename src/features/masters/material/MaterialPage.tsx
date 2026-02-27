@@ -13,26 +13,39 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
 import type { Category } from "../../../types/category";
-import CategoryForm from "./CategoryForm";
+import type { Material } from "../../../types/material";
+import type { Unit } from "../../../types/unit";
+
 import {
-  createCategory,
-  deleteCategory,
   getCategories,
-  updateCategory,
-} from "./categoryApi";
+} from "../category/categoryApi";
+import {
+  getUnits,
+} from "../unit/unitApi";
+import {
+  getMaterials,
+  updateMaterial,
+  createMaterial,
+  deleteMaterial,
+} from "./materialApi";
+
+import MaterialForm, { type MaterialFormValues } from "./MaterialForm";
 
 import { useLoader } from "../../../app/providers/LoaderProvider";
 import { useSnackbar } from "../../../app/providers/SnackBarProvider";
 
 import DataTable from "../../../components/common/DataTable";
 
-const CategoryPage = () => {
+const MaterialPage = () => {
   const { showLoader, hideLoader } = useLoader();
   const { showSnackbar } = useSnackbar();
 
+  const [materials, setMaterials] = useState<Material[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [units, setUnits] = useState<Unit[]>([]);
+
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<Category | null>(null);
+  const [selected, setSelected] = useState<Material | null>(null);
   const [search, setSearch] = useState("");
 
   // pagination
@@ -42,48 +55,56 @@ const CategoryPage = () => {
   // ============================
   // FETCH DATA
   // ============================
-  const fetchData = async () => {
+  const fetchAll = async () => {
     try {
       showLoader();
-      const res = await getCategories();
-      setCategories(res.data);
+
+      const [mat, cat, unit] = await Promise.all([
+        getMaterials(),
+        getCategories(),
+        getUnits(),
+      ]);
+
+      setMaterials(mat.data);
+      setCategories(cat.data);
+      setUnits(unit.data);
     } catch {
-      showSnackbar("Failed to fetch categories", "error");
+      showSnackbar("Failed to load data", "error");
     } finally {
       hideLoader();
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchAll();
   }, []);
 
   // ============================
   // HANDLERS
   // ============================
-  const handleAdd = async (data: any) => {
+  const handleSubmit = async (data: MaterialFormValues) => {
     try {
       showLoader();
 
       if (selected) {
-        await updateCategory(selected.id, data);
-        showSnackbar("Category updated successfully");
+        await updateMaterial(selected.id, data);
+        showSnackbar("Material updated");
       } else {
-        await createCategory(data);
-        showSnackbar("Category created successfully");
+        await createMaterial(data);
+        showSnackbar("Material created");
       }
 
-      fetchData();
       setOpen(false);
       setSelected(null);
-    } catch (error: any) {
-      showSnackbar(error.message || "Something went wrong", "error");
+      fetchAll();
+    } catch {
+      showSnackbar("Operation failed", "error");
     } finally {
       hideLoader();
     }
   };
 
-  const handleEdit = (row: Category) => {
+  const handleEdit = (row: Material) => {
     setSelected(row);
     setOpen(true);
   };
@@ -91,9 +112,9 @@ const CategoryPage = () => {
   const handleDelete = async (id: number) => {
     try {
       showLoader();
-      await deleteCategory(id);
+      await deleteMaterial(id);
       showSnackbar("Deleted successfully");
-      fetchData();
+      fetchAll();
     } catch {
       showSnackbar("Delete failed", "error");
     } finally {
@@ -104,33 +125,51 @@ const CategoryPage = () => {
   // ============================
   // SEARCH FILTER
   // ============================
-  const filtered = categories.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
+  const filtered = materials.filter((m) =>
+    m.name.toLowerCase().includes(search.toLowerCase())
   );
 
   // ============================
   // ROWS
   // ============================
-const rows = filtered.map((item, index) => ({
-  id: item.id,
-  name: item.name,
-  srNo: page * pageSize + index + 1,
-}));
+  const rows = filtered.map((item, index) => ({
+    id: item.id,
+    srNo: page * pageSize + index + 1,
+    name: item.name,
+    category: item.category?.name || "-",
+    unit: item.unit?.name || "-",
+    rate: item.rate,
+  }));
 
   // ============================
   // COLUMNS
   // ============================
   const columns = [
     {
-    field: "srNo",
-    headerName: "#",
-    width: 80,
-    sortable: false,
-  },
+      field: "srNo",
+      headerName: "#",
+      width: 80,
+      sortable: false,
+    },
     {
       field: "name",
       headerName: "Name",
       flex: 1,
+    },
+    {
+      field: "category",
+      headerName: "Category",
+      flex: 1,
+    },
+    {
+      field: "unit",
+      headerName: "Unit",
+      flex: 1,
+    },
+    {
+      field: "rate",
+      headerName: "Rate",
+      width: 120,
     },
     {
       field: "actions",
@@ -161,13 +200,13 @@ const rows = filtered.map((item, index) => ({
         mb={2}
       >
         <Typography variant="h5" fontWeight="bold">
-          Category Master
+          Material Master
         </Typography>
 
         <Stack direction="row" spacing={2}>
           <TextField
             size="small"
-            placeholder="Search category..."
+            placeholder="Search material..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             sx={{ width: 250 }}
@@ -180,7 +219,7 @@ const rows = filtered.map((item, index) => ({
               setOpen(true);
             }}
           >
-            Add Category
+            Add Material
           </Button>
         </Stack>
       </Stack>
@@ -201,14 +240,16 @@ const rows = filtered.map((item, index) => ({
       </Card>
 
       {/* FORM */}
-      <CategoryForm
+      <MaterialForm
         open={open}
         handleClose={() => setOpen(false)}
-        onSubmit={handleAdd}
+        onSubmit={handleSubmit}
+        categories={categories}
+        units={units}
         defaultValues={selected}
       />
     </Box>
   );
 };
 
-export default CategoryPage;
+export default MaterialPage;

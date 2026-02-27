@@ -19,7 +19,7 @@ export const updateCategory = async (
     id: number,
     data: CategoryFormValues
 ): Promise<Category> => {
-    const res = await instance.put(`${BASE_URL}/${id}`, data);
+    const res = await instance.post(`${BASE_URL}/${id}`, data);
     return res.data;
 };
 
