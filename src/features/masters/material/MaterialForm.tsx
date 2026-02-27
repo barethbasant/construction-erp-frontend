@@ -12,11 +12,11 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
-import type { CreateMaterialDto, Material } from "../../../types/material";
+import type {  Material } from "../../../types/material";
 import type { Category } from "../../../types/category";
 import type { Unit } from "../../../types/unit";
 
-export type MaterialFormValues = {
+export type MaterialFormValues =  {
   name: string;
   categoryId: number | null;
   unitId: number | null;
@@ -35,15 +35,9 @@ interface Props {
 
 // ✅ FIXED SCHEMA (use nullable)
 const schema = yup.object({
-  name: yup.string().required("Material name required"),
-  categoryId: yup
-    .number()
-    .nullable()
-    .required("Category required"),
-  unitId: yup
-    .number()
-    .nullable()
-    .required("Unit required"),
+  name: yup.string().required(),
+  categoryId: yup.number().nullable().required(),
+  unitId: yup.number().nullable().required(),
   rate: yup.number().optional(),
   minimumStockLevel: yup.number().optional(),
 });
@@ -62,15 +56,8 @@ const MaterialForm = ({
     control,
     formState: { errors },
   } = useForm<MaterialFormValues>({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      name: "",
-      categoryId: null,
-      unitId: null,
-      rate: 0,
-      minimumStockLevel: 0,
-    },
-  });
+  resolver: yupResolver(schema) as any,
+});
 
   // ============================
   // RESET FORM

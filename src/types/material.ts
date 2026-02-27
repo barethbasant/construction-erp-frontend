@@ -17,11 +17,5 @@ export interface Material {
   };
 }
 
-export interface CreateMaterialDto {
-  name: string;
-  categoryId: number;
-  unitId: number;
-  rate?: number;
-  minimumStockLevel?: number;
-}
+
 

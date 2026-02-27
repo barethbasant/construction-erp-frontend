@@ -15,6 +15,21 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 
+type ItemForm = {
+  materialId: number;
+  quantity: number;
+  rate: number;
+  amount: number;
+};
+
+type POFormValues = {
+  poNumber: string;
+  siteId: number | "";
+  vendorId: number | "";
+  purchaseRequestId: number | "";
+  items: ItemForm[];
+};
+
 const PurchaseOrderForm = ({
   open,
   handleClose,
@@ -24,22 +39,23 @@ const PurchaseOrderForm = ({
   materials,
   purchaseRequests,
 }: any) => {
-  const { control, register, handleSubmit, watch, setValue } = useForm({
-    defaultValues: {
-      poNumber: "",
-      siteId: "",
-      vendorId: "",
-      purchaseRequestId: "",
-      items: [
-        {
-          materialId: "",
-          quantity: 1,
-          rate: 0,
-          amount: 0,
-        },
-      ],
-    },
-  });
+  const { control, register, handleSubmit, watch, setValue } =
+    useForm<POFormValues>({
+      defaultValues: {
+        poNumber: "",
+        siteId: "",
+        vendorId: "",
+        purchaseRequestId: "",
+        items: [
+          {
+            materialId: 0,
+            quantity: 1,
+            rate: 0,
+            amount: 0,
+          },
+        ],
+      },
+    });
 
   const { fields, append, remove } = useFieldArray({
     control,
@@ -52,16 +68,20 @@ const PurchaseOrderForm = ({
   // TOTAL CALCULATION
   // ============================
   const totalAmount = items.reduce(
-    (sum: number, item: any) => sum + Number(item.amount || 0),
+    (sum, item) => sum + Number(item.amount || 0),
     0
   );
 
   // ============================
   // SUBMIT
   // ============================
-  const handleFormSubmit = (data: any) => {
-    data.totalAmount = totalAmount;
-    onSubmit(data);
+  const handleFormSubmit = (data: POFormValues) => {
+    const payload = {
+      ...data,
+      totalAmount,
+    };
+
+    onSubmit(payload);
   };
 
   return (
@@ -73,7 +93,12 @@ const PurchaseOrderForm = ({
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} mt={1}>
           <TextField fullWidth label="PO Number" {...register("poNumber")} />
 
-          <TextField select fullWidth label="Site" {...register("siteId")}>
+          <TextField
+            select
+            fullWidth
+            label="Site"
+            {...register("siteId", { valueAsNumber: true })}
+          >
             {sites.map((s: any) => (
               <MenuItem key={s.id} value={s.id}>
                 {s.name}
@@ -81,7 +106,12 @@ const PurchaseOrderForm = ({
             ))}
           </TextField>
 
-          <TextField select fullWidth label="Vendor" {...register("vendorId")}>
+          <TextField
+            select
+            fullWidth
+            label="Vendor"
+            {...register("vendorId", { valueAsNumber: true })}
+          >
             {vendors.map((v: any) => (
               <MenuItem key={v.id} value={v.id}>
                 {v.name}
@@ -93,7 +123,7 @@ const PurchaseOrderForm = ({
             select
             fullWidth
             label="Purchase Request"
-            {...register("purchaseRequestId")}
+            {...register("purchaseRequestId", { valueAsNumber: true })}
           >
             <MenuItem value="">None</MenuItem>
             {purchaseRequests.map((pr: any) => (
@@ -130,7 +160,9 @@ const PurchaseOrderForm = ({
                 fullWidth
                 size="small"
                 label="Material"
-                {...register(`items.${index}.materialId`)}
+                {...register(`items.${index}.materialId`, {
+                  valueAsNumber: true,
+                })}
                 onChange={(e) => {
                   const materialId = Number(e.target.value);
                   setValue(`items.${index}.materialId`, materialId);
@@ -144,7 +176,10 @@ const PurchaseOrderForm = ({
                     setValue(`items.${index}.rate`, rate);
 
                     const qty = Number(items[index]?.quantity || 0);
-                    setValue(`items.${index}.amount`, qty * rate);
+                    setValue(
+                      `items.${index}.amount`,
+                      qty * rate
+                    );
                   }
                 }}
               >
@@ -171,7 +206,10 @@ const PurchaseOrderForm = ({
                       field.onChange(qty);
 
                       const rate = Number(items[index]?.rate || 0);
-                      setValue(`items.${index}.amount`, qty * rate);
+                      setValue(
+                        `items.${index}.amount`,
+                        qty * rate
+                      );
                     }}
                   />
                 )}
@@ -193,7 +231,10 @@ const PurchaseOrderForm = ({
                       field.onChange(rate);
 
                       const qty = Number(items[index]?.quantity || 0);
-                      setValue(`items.${index}.amount`, qty * rate);
+                      setValue(
+                        `items.${index}.amount`,
+                        qty * rate
+                      );
                     }}
                   />
                 )}
@@ -229,7 +270,7 @@ const PurchaseOrderForm = ({
             startIcon={<AddIcon />}
             onClick={() =>
               append({
-                materialId: "",
+                materialId: 0,
                 quantity: 1,
                 rate: 0,
                 amount: 0,
@@ -250,7 +291,10 @@ const PurchaseOrderForm = ({
 
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button variant="contained" onClick={handleSubmit(handleFormSubmit)}>
+        <Button
+          variant="contained"
+          onClick={handleSubmit(handleFormSubmit)}
+        >
           Save
         </Button>
       </DialogActions>

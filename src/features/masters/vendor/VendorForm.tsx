@@ -37,7 +37,7 @@ const VendorForm = ({
     reset,
     formState: { errors },
   } = useForm<CreateVendorDto>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any ,
   });
 
   useEffect(() => {

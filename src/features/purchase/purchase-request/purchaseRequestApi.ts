@@ -3,7 +3,7 @@ import type { CreatePurchaseRequestDto, PurchaseRequest } from "../../../types/p
 
 const BASE_URL = "/features/purchase-request";
 
-export const getPurchaseRequests = async (): Promise<PurchaseRequest[]> => {
+export const getPurchaseRequests = async (): Promise<{data : PurchaseRequest[]}> => {
   const res = await api.get(BASE_URL);
   return res.data;
 };

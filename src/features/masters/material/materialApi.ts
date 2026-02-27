@@ -1,5 +1,5 @@
 import api from "../../../lib/axios";
-import type { CreateMaterialDto, Material } from "../../../types/material";
+import type {  Material } from "../../../types/material";
 import type { MaterialFormValues } from "./MaterialForm";
 
 

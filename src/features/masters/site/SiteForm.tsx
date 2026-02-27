@@ -12,7 +12,6 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup"; 
-import { Cancel, Save } from "@mui/icons-material";
 import type { CreateSiteDto, Site } from "../../../types/site";
 
 interface Props {
@@ -45,7 +44,7 @@ const SiteForm = ({
     control,
     formState: { errors },
   } = useForm<CreateSiteDto>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as any,
     defaultValues: { isActive: true },
   });
 
